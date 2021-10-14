@@ -9,6 +9,11 @@ public class Tile
    private int x;
    private int y;
 
+   private int gCost; //Distance to start from tile
+   private int hCost; //Distance to end form tile
+   private int fCost; //hCost + fCost
+
+
    private readonly List<Tile> neighbours = new List<Tile>();
 
 
@@ -76,6 +81,43 @@ public class Tile
    public void AddNeighbours(Tile tile)
    {
       neighbours.Add(tile);
+   }
+   
+   
+   
+   
+   
+   
+   //Pathfinding bits
+   
+   public int GetGCost()
+   {
+      return gCost;
+   }
+   
+   public int GetHCost()
+   {
+      return hCost;
+   }
+
+   public int GetFCost()
+   {
+      return fCost;
+   }
+   
+   public void SetGCost(int gCost)
+   {
+      this.gCost = gCost;
+   }
+   
+   public void SetHCost(int hCost)
+   {
+      this.hCost = hCost;
+   }
+   
+   public void SetFCost(int fCost)
+   {
+      this.fCost = fCost;
    }
 }
    
