@@ -4,43 +4,55 @@ using UnityEngine;
 
 public class TileManager{
     
-    private readonly List<Tile> tiles = new List<Tile>();
+    private readonly List<List<Tile>> grid = new List<List<Tile>>();
     private readonly List<Tile> seenTiles = new List<Tile>();
     private readonly List<Tile> visitedTiles = new List<Tile>();
     private Tile startTile;
     private Tile goalTile;
 
-    public void AddTile(Tile tile)
-    {
 
-        tiles.Add(tile);
+    
+    public void AddTile(Tile tile, int column)
+    {
+        grid[column].Add(tile);
+    }
+    
+    public void AddColumn()
+    {
+        grid.Add(new List<Tile>());
     }
 
-    public List<Tile> GetTiles()
+    public List<List<Tile>> GetTiles()
     {
-        return tiles;
+        return grid;
     }
 
     
     public void SetStartTile(string coordinates)
     {
-        foreach (var tile in tiles.Where(tile => tile.GetCoordinates().Equals(coordinates)))
+        foreach (var column in grid)
         {
-            startTile = tile;
-            tile.SetColour(Color.blue);
-            foreach (var neighbourTile in tile.GetNeighbours())
+            foreach (var tile in column.Where(tile => tile.GetCoordinates().Equals(coordinates)))
             {
-                neighbourTile.SetColour(Color.yellow);
+                startTile = tile;
+                tile.SetColour(Color.blue);
+                foreach (var neighbourTile in tile.GetNeighbours())
+                {
+                    neighbourTile.SetColour(Color.yellow);
+                }
             }
         }
     }
     
     public void SetGoalTile(string coordinates)
     {
-        foreach (var tile in tiles.Where(tile => tile.GetCoordinates().Equals(coordinates)))
+        foreach (var column in grid)
         {
-            goalTile = tile;
-            tile.SetColour(Color.cyan);
+            foreach (var tile in column.Where(tile => tile.GetCoordinates().Equals(coordinates)))
+            {
+                goalTile = tile;
+                tile.SetColour(Color.cyan);
+            }
         }
     }
 

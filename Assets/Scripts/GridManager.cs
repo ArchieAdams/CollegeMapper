@@ -9,11 +9,11 @@ using UnityEngine.UI;
 public class GridManager : MonoBehaviour
 {
     [SerializeField]
-    private int rows = 16;
+    private int rows = 16; //Number of rows in the grid
     [SerializeField]
-    private int columns = 9;
+    private int columns = 9; //Number of columns in the grid
     [SerializeField]
-    private int tileSize = 1;
+    private int tileSize = 1; //Spacing between tiles
 
     private readonly TileManager tileManager = new TileManager();
     
@@ -26,20 +26,24 @@ public class GridManager : MonoBehaviour
     {
         GenerateGrid();
     }
-
+    
+    /// <summary>
+    /// Creates a grid of row x columns and saves the tiles to a list
+    /// </summary>
     private void GenerateGrid()
     {
-        GameObject referenceTile = (GameObject)Instantiate(Resources.Load("Tile"));
-        for (int row = 0; row < rows; row++)
+        GameObject referenceTile = (GameObject)Instantiate(Resources.Load("Tile")); //Gets the prefab for your tile so you only have to load it once
+        for (int column = 0; column < columns; column++)
         {
-            for (int column = 0; column < columns; column++)
+
+            tileManager.AddColumn();
+            for (int row = 0; row < rows; row++)
             {
-                Tile tile = new Tile(Instantiate(referenceTile, transform), column * tileSize, row * tileSize);
-                tileManager.AddTile(tile);
-                
+                Tile tile = new Tile(Instantiate(referenceTile, transform), column * tileSize, row * tileSize); //Creates new tile object for each coordinate 
+                tileManager.AddTile(tile, column); //Adds tiles to the list of all tiles (the grid)
             }
         }
-        Destroy(referenceTile);
+        Destroy(referenceTile); //Stops the program having to load the referenceTile and frees up memory
         AddNeighbours();
         float gridWidth = columns * tileSize;
         float gridHeight = rows * tileSize;
@@ -47,28 +51,42 @@ public class GridManager : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Loops through all tiles and adds there neighbours to a list
+    /// </summary>
     private void AddNeighbours()
     {
-        List<Tile> tiles = tileManager.GetTiles();
-        foreach (var tile in tiles)
+        List<List<Tile>> grid = tileManager.GetTiles();
+        foreach (var column in grid)
         {
-            int x = tile.GetX();
-            int y = tile.GetY();
-            for (int xDifference = -1; xDifference <= 1; xDifference++)
+            foreach (var tile in column)
             {
-                for (int yDifference = -1; yDifference <= 1; yDifference++)
+                int x = tile.GetX();
+                int y = tile.GetY();
+                for (int xDifference = -1; xDifference <= 1; xDifference++)
                 {
-                    foreach (var neighbourTile in tiles.Where(neighbourTile =>
-                        neighbourTile.GetX() == x + xDifference && neighbourTile.GetY() == y + yDifference &&
-                        !(xDifference == 0 && yDifference == 0)))
+                    for (int yDifference = -1; yDifference <= 1; yDifference++)
                     {
-                        tile.AddNeighbours(neighbourTile);
+                        if (!(xDifference == 0 && yDifference == 0))
+                        {
+                            try
+                            {
+                                tile.AddNeighbours(tileManager.GetTiles()[y+yDifference][x+xDifference]);
+                            }
+                            catch (Exception)
+                            {
+                                // ignored
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
+    /// <summary>
+    /// Sets important locations called by a button press
+    /// </summary>
     public void SetLocations()
     {
         tileManager.SetStartTile(startInputField.text);
@@ -88,11 +106,21 @@ public class GridManager : MonoBehaviour
         nextTile.SetColour(Color.magenta);
     }
 
+    /// <summary>
+    /// Finds the distance between 2 points.
+    /// </summary>
+    /// <param name="tileA">The first tile you want to find the distance between.</param>
+    /// <param name="tileB">The second tile you want to find the distance between.</param>
+    /// <returns>The distance between the points as an int this number has been x10 to make it easier to interpret.</returns>
     private int CalculateDistance(Tile tileA, Tile tileB)
     {
         return (int)(Math.Sqrt(Math.Pow(tileA.GetX() - tileB.GetX(), 2) + Math.Pow(tileA.GetY() - tileB.GetY(), 2)) * 10);
     }
-
+    
+    /// <summary>
+    /// Searches all seen tiles for the one containing the lowest F cost.
+    /// </summary>
+    /// <returns>The Tile that contains the lowest F cost.</returns>
     private Tile GetLowestFCost()
     {
         Tile lowestTile = null;
@@ -127,6 +155,7 @@ public class GridManager : MonoBehaviour
     void Update()
     {
     }
+
     
     
 }
