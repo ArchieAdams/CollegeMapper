@@ -515,7 +515,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1458468430}
   - component: {fileID: 1458468429}
-  - component: {fileID: 1458468431}
   m_Layer: 0
   m_Name: GridHolder
   m_TagString: Untagged
@@ -535,8 +534,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa494a6b494d39a409f87bece529f173, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rows: 100
-  columns: 100
+  rows: 10
+  columns: 10
   tileSize: 1
   startInputField: {fileID: 210803283}
   goalInputField: {fileID: 752285252}
@@ -554,18 +553,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1458468431
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1458468428}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 618e3976e4cb88e4c995728507fdf9ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1465482535
 PrefabInstance:
   m_ObjectHideFlags: 0

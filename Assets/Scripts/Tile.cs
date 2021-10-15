@@ -9,9 +9,11 @@ public class Tile
    private int x;
    private int y;
 
-   private int gCost; //Distance to start from tile
-   private int hCost; //Distance to end form tile
-   private int fCost; //hCost + fCost
+   private int gCost = -1; //Distance to start from tile
+   private int hCost = -1; //Distance to end form tile
+   private int fCost = -1; //hCost + fCost
+
+   private bool walkable;
 
 
    private readonly List<Tile> neighbours = new List<Tile>();
@@ -105,6 +107,11 @@ public class Tile
       return fCost;
    }
    
+   public bool IsWalkable()
+   {
+      return walkable;
+   }
+   
    public void SetGCost(int gCost)
    {
       this.gCost = gCost;
@@ -118,6 +125,11 @@ public class Tile
    public void SetFCost(int fCost)
    {
       this.fCost = fCost;
+   }
+   
+   public void SetWalkable(bool walkable)
+   {
+      this.walkable = walkable;
    }
 }
    

@@ -56,7 +56,7 @@ public class GridManager : MonoBehaviour
     /// </summary>
     private void AddNeighbours()
     {
-        List<List<Tile>> grid = tileManager.GetTiles();
+        List<List<Tile>> grid = tileManager.GetGrid();
         foreach (var column in grid)
         {
             foreach (var tile in column)
@@ -71,7 +71,7 @@ public class GridManager : MonoBehaviour
                         {
                             try
                             {
-                                tile.AddNeighbours(tileManager.GetTiles()[y+yDifference][x+xDifference]);
+                                tile.AddNeighbours(tileManager.GetGrid()[x+xDifference][y+yDifference]);
                             }
                             catch (Exception)
                             {
@@ -89,33 +89,13 @@ public class GridManager : MonoBehaviour
     /// </summary>
     public void SetLocations()
     {
-        tileManager.SetStartTile(startInputField.text);
         tileManager.SetGoalTile(goalInputField.text);
-        foreach (var neighbour in tileManager.GetStartTile().GetNeighbours())
-        {
-            neighbour.SetGCost(CalculateDistance(neighbour, tileManager.GetStartTile()));
-            neighbour.SetHCost(CalculateDistance(neighbour, tileManager.GetGoalTile()));
-            neighbour.SetFCost(neighbour.GetGCost() + neighbour.GetHCost());
-            Debug.Log(neighbour.GetCoordinates() + " G:" + neighbour.GetGCost() + " + H:" + neighbour.GetHCost() + " = F:" +
-                      neighbour.GetFCost());
-
-        }
-
-        Tile nextTile = GetLowestFCost();
-        Debug.Log(nextTile.GetCoordinates());
-        nextTile.SetColour(Color.magenta);
+        tileManager.SetStartTile(startInputField.text);
+        
+        Pathfinding();
     }
 
-    /// <summary>
-    /// Finds the distance between 2 points.
-    /// </summary>
-    /// <param name="tileA">The first tile you want to find the distance between.</param>
-    /// <param name="tileB">The second tile you want to find the distance between.</param>
-    /// <returns>The distance between the points as an int this number has been x10 to make it easier to interpret.</returns>
-    private int CalculateDistance(Tile tileA, Tile tileB)
-    {
-        return (int)(Math.Sqrt(Math.Pow(tileA.GetX() - tileB.GetX(), 2) + Math.Pow(tileA.GetY() - tileB.GetY(), 2)) * 10);
-    }
+    
     
     /// <summary>
     /// Searches all seen tiles for the one containing the lowest F cost.
@@ -126,30 +106,60 @@ public class GridManager : MonoBehaviour
         Tile lowestTile = null;
         int lowestFCost = -1;
         int lowestHCost = -1;
-        foreach (var neighbour in tileManager.GetStartTile().GetNeighbours())
+        foreach (var seenTiles in tileManager.GetSeenTiles())
         {
-            if (neighbour.GetFCost()<lowestFCost || lowestFCost == -1)
+            Debug.Log(seenTiles.GetCoordinates());
+            if (seenTiles.GetFCost()<lowestFCost || lowestFCost == -1)
             {
-                lowestTile = neighbour;
-                lowestFCost = neighbour.GetFCost();
-                lowestHCost = neighbour.GetHCost();
+                lowestTile = seenTiles;
+                lowestFCost = seenTiles.GetFCost();
+                lowestHCost = seenTiles.GetHCost();
             }
 
-            if (neighbour.GetFCost() == lowestHCost)
+            if (seenTiles.GetFCost() == lowestHCost)
             {
-                if (neighbour.GetFCost() < lowestFCost)
+                if (seenTiles.GetFCost() <= lowestFCost)
                 {
-                    lowestTile = neighbour;
-                    lowestFCost = neighbour.GetFCost();
-                    lowestHCost = neighbour.GetHCost();
+                    lowestTile = seenTiles;
+                    lowestFCost = seenTiles.GetFCost();
+                    lowestHCost = seenTiles.GetHCost();
                 }
             }
         }
 
         return lowestTile;
     }
+
+    private void Pathfinding()
+    {
+        StartCoroutine(nameof(FindPath));
+    }
     
-    
+    IEnumerator FindPath() 
+    {
+        int i = 0;
+        while (true)
+        {
+            
+            if (!(tileManager.GetLastTile().Equals(tileManager.GetGoalTile())))
+            {
+                tileManager.AddVisitedTiles(GetLowestFCost());
+            }
+            else
+            {
+                break;
+            }
+
+            if (i==100)
+            {
+                break;
+            }
+
+            i++;
+            yield return new WaitForSeconds(1f);
+        }
+        Debug.Log("Done: "+i);
+    }
 
     // Update is called once per frame
     void Update()
